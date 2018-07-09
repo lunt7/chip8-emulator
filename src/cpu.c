@@ -231,6 +231,7 @@ void cpuExecute(Chip8CPU* cpu)
 
         /* Dxyn - DRW Vx, Vy, nibble */
         case 0xD000:
+            cpu->V[0xF] = 0;
             yy = cpu->V[y] % SCREEN_HEIGHT;
             for (int32_t row = 0; row < nibble; row++) {
                 xx = cpu->V[x] % SCREEN_WIDTH;
@@ -312,7 +313,7 @@ void cpuExecute(Chip8CPU* cpu)
 
                 /* Fx29 - LD F, Vx */
                 case 0x0029:
-                    cpu->I = cpu->ram[5 * cpu->V[x] ];
+                    cpu->I = 5 * cpu->V[x];
                     cpu->PC += 2;
                     break;
 
