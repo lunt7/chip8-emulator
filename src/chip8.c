@@ -4,6 +4,11 @@
 #include <SDL2/SDL.h>
 #include "chip8.h"
 
+#define FRAME_RATE              60
+#define FRAME_TIME_MS           (1000 / FRAME_RATE)
+#define CPU_FREQUENCY           600
+#define CYCLES_PER_FRAME_TIME   (CPU_FREQUENCY / FRAME_RATE)
+
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Texture* texture = NULL;
@@ -100,12 +105,13 @@ int32_t chip8LoadROM(Chip8CPU* cpu, const char* file)
 
 void chip8Execute(Chip8CPU* cpu)
 {
-    int32_t i, frametime;
+    int32_t i, t0, elapsed;
     bool exit = false;
     SDL_Event event;
 
-    frametime = SDL_GetTicks();
     while (!exit) {
+
+        t0 = SDL_GetTicks();
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || keyStates[SDL_SCANCODE_ESCAPE]) {
@@ -116,15 +122,16 @@ void chip8Execute(Chip8CPU* cpu)
             cpu->key[i] = keyStates[ KeyBindings[i] ];
         }
 
-        cpuExecute(cpu);
+        for (i = 0; i < CYCLES_PER_FRAME_TIME; i++) {
+            cpuExecute(cpu);
+        }
 
-        // Update timers and draw display at 60 Hz
-        if ((SDL_GetTicks() - frametime) > 1000 / 60) {
-            chip8DrawScreen(cpu);
-            cpuUpdateTimers(cpu);
-            frametime = SDL_GetTicks();
-        } else {
-            SDL_Delay(1);
+        chip8DrawScreen(cpu);
+        cpuUpdateTimers(cpu);
+
+        elapsed = SDL_GetTicks() - t0;
+        if (elapsed < FRAME_TIME_MS) {
+            SDL_Delay(FRAME_TIME_MS - elapsed);
         }
     }
 }
