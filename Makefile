@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g -O0 -Iinc -fsanitize=address
+CFLAGS = -Wall -g -O3 -Iinc
 LDFLAGS = -lSDL2
 
 TARGET = chip8
