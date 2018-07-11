@@ -236,9 +236,9 @@ void cpuExecute(Chip8CPU* cpu)
             for (int32_t row = 0; row < nibble; row++) {
                 xx = cpu->V[x] % SCREEN_WIDTH;
                 spriteByte = cpu->ram[ cpu->I + row ];
-                for (int32_t col = 0; col < 8; col++) {           
+                for (int32_t col = 0; col < 8; col++) {
                     pixel = (spriteByte >> (7 - col)) & 0x01;
-                    idx = yy * SCREEN_WIDTH + xx; 
+                    idx = yy * SCREEN_WIDTH + xx;
                     if (cpu->framebuff[idx] && pixel) {
                         cpu->V[0xF] = 1;
                     }
@@ -254,7 +254,7 @@ void cpuExecute(Chip8CPU* cpu)
             switch (opcode & 0x00FF) {
                 /* Ex9E - SKP Vx */
                 case 0x009E:
-                    if (cpu->key[x])
+                    if (cpu->key[ cpu->V[x] ])
                         cpu->PC += 4;
                     else
                         cpu->PC += 2;
@@ -262,7 +262,7 @@ void cpuExecute(Chip8CPU* cpu)
 
                 /* ExA1 - SKNP Vx */
                 case 0x00A1:
-                    if (!cpu->key[x])
+                    if (!cpu->key[ cpu->V[x] ])
                         cpu->PC += 4;
                     else
                         cpu->PC += 2;
